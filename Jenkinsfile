@@ -1,3 +1,5 @@
+/*
+
 pipeline{
 
 agent any
@@ -50,7 +52,7 @@ stages{
   }
   }
   }
-  */
+
 }//Stages Closing
 
 post{
@@ -72,4 +74,59 @@ post{
 }
 
 
-}//Pipeline closing
+}
+*/
+
+
+
+node(){
+    
+    def mavenHome=tool name: "maven3.9.11"
+    
+    properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '3')), pipelineTriggers([githubPush()])])
+    
+    stage('checkout'){
+        git credentialsId: '81121b4f-64b3-46db-8908-dc33cb0edb99', url: 'https://github.com/akhilmatta89/maven-web-application.git'
+    }
+    
+    stage('CreatePackage'){
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+        
+    stage('sonar'){
+        sh "${mavenHome}/bin/mvn sonar:sonar"
+    }
+            
+    stage('UploadArtifactsToNexus'){
+        sh "${mavenHome}/bin/mvn deploy"
+    }
+    
+    stage('copyToTomcat'){
+      sshagent(['6b398c92-3ef8-4e48-868c-d1626f8cac61']) {
+        sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.61.186.132:/opt/apache-tomcat-9.0.109/webapps/"
+        }  
+    }
+    
+stage("SendMail") {
+    emailext(
+        subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - ${currentBuild.currentResult}",
+        body: """
+        <html>
+        <body>
+            <h2>Jenkins Build Notification</h2>
+            <p><b>Job:</b> ${JOB_NAME}</p>
+            <p><b>Build Number:</b> ${BUILD_NUMBER}</p>
+            <p><b>Status:</b> ${currentBuild.currentResult}</p>
+            <p><b>Build URL:</b> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
+            <br/>
+            <p>Regards,<br/>Jenkins CI/CD</p>
+        </body>
+        </html>
+        """,
+        to: 'akhilreddy2672@gmail.com',
+        mimeType: 'text/html'
+    )
+}
+
+
+}
