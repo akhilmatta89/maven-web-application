@@ -11,7 +11,7 @@
 <body>
 <h1 align="center">Welcome to Akhil Technologies</h1>
 <h1 align="center">Phone Number: +353 899494436</h1>
-<h1 align="center">Akhil Technologies is a Very Good Training Center for Learning AWS DevOps, Jenkins, Docker, Kubernetes, GitOps, ArgoCD, Terraform and Amazon Web Services</h1>
+<h1 align="center">Akhil Technologies is a Very Good Training Center for Learning AWS DevOps, Jenkins, Docker, Kubernetes, GitOps, ArgoCD, Terraform, Ansible and Amazon Web Services</h1>
 
 <h1 align="center">Trainer Name: Akhil Reddy Matta</h1>
 
